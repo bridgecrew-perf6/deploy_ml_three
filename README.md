@@ -23,8 +23,30 @@ Remember that your README should:
 - Tune at least two hyperparameters
 - Retrieve the best best hyperparameters from all your training jobs
 
+The following image shows four training job that where completed with all their relevant information 
+
+![alt text](img/hpo_1.png)
+
+The following the parameters for the best model
+
+![alt text](img/hpo_2.png)
+
+
 ## Debugging and Profiling
-**TODO**: Give an overview of how you performed model debugging and profiling in Sagemaker
+
+To gain insights into our model training job, we have utilized the SageMaker Debugger and Profiler. Hooks are added to the training job located in `train_model.py` and then called from the profile section in the `train_and_deploy.ipynb`. The following rules were added to the debugger profile. 
+
+`
+rules = [
+ Rule.sagemaker(rule_configs.vanishing_gradient()),
+ Rule.sagemaker(rule_configs.overfit()),
+ Rule.sagemaker(rule_configs.overtraining()),
+ Rule.sagemaker(rule_configs.poor_weight_initialization()),
+ ProfilerRule.sagemaker(rule_configs.ProfilerReport()),
+]
+`
+
+
 
 ### Results
 **TODO**: What are the results/insights did you get by profiling/debugging your model?
@@ -33,9 +55,14 @@ Remember that your README should:
 
 
 ## Model Deployment
-**TODO**: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
 
-**TODO** Remember to provide a screenshot of the deployed active endpoint in Sagemaker.
+Following is the process of deploying the trained model in `train_and_deploy.ipynb`: 
 
-## Standout Suggestions
-**TODO (Optional):** This is where you can provide information about any standout suggestions that you have attempted.
+- Fit an estimator model using `hop.py` and best the best hyperparameters
+- Define `ImagePredictor` for `predictor_cls`
+- Define the entry_pint code that is required for inference in `infernce.py` 
+- Deploy the model on a single `ml.m5.large` instance
+- Load a local file image to a `bytearray` and send it via the `.predict` method to the endpoint  
+
+
+-https://docs.aws.amazon.com/sagemaker/latest/dg/debugger-profiling-report.html
